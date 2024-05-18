@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { ChartProps } from 'react-chartjs-2'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,7 +29,7 @@ export function mapRawRowToTransactionData(rawData: RawTransactionRow): Blockcha
 export function getUserWalletTrends(transactions: BlockchainTransaction[]): any {
   const userWalletCounts: { [x: string]: number } = {}
   transactions.forEach((transaction) => {
-    const wallet = transaction.userWallet
+    const wallet = transaction.userWallet ?? 'Other'
     if (userWalletCounts[wallet]) {
       userWalletCounts[wallet]++
     } else {
