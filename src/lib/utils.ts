@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { chartColors } from './constants'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -44,8 +45,35 @@ export function getUserWalletTrends(transactions: BlockchainTransaction[]): any 
     labels,
     datasets: [
       {
-        label: '# of transactions',
-        data: walletCounts
+        label: '# Tx',
+        data: walletCounts,
+        backgroundColor: walletCounts.map((_, index) => chartColors[index])
+      }
+    ]
+  }
+}
+
+export function getPaymentMethodTrends(transactions: BlockchainTransaction[]): any {
+  const userWalletCounts: { [x: string]: number } = {}
+  transactions.forEach((transaction) => {
+    const wallet = transaction.paymentMethod ?? 'Other'
+    if (userWalletCounts[wallet]) {
+      userWalletCounts[wallet]++
+    } else {
+      userWalletCounts[wallet] = 1
+    }
+  })
+
+  const labels = Object.keys(userWalletCounts)
+  const walletCounts = Object.values(userWalletCounts)
+
+  return {
+    labels,
+    datasets: [
+      {
+        label: '# Tx',
+        data: walletCounts,
+        backgroundColor: walletCounts.map((_, index) => chartColors[index])
       }
     ]
   }
