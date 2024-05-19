@@ -1,7 +1,9 @@
 import { getPaymentMethodTrends } from '@/lib/utils'
 import { ChartComponentProps } from '@/types'
 import { Chart, ChartOptions, registerables } from 'chart.js'
+import { Bitcoin } from 'lucide-react'
 import { Line } from 'react-chartjs-2'
+import ChartCard from './ChartCard'
 import 'chartjs-adapter-date-fns'
 
 Chart.register(...registerables)
@@ -43,9 +45,9 @@ const WalletTrends = ({ transactions }: ChartComponentProps) => {
   }
 
   return (
-    <section className="flex flex-row gap-5">
+    <ChartCard icon={<Bitcoin />} title="Payment Trends">
       <Line data={{ labels, datasets }} options={options} />
-    </section>
+    </ChartCard>
   )
 }
 
