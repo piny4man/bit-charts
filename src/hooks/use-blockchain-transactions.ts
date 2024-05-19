@@ -1,5 +1,6 @@
 import { getTransactions } from '@/lib/services'
 import { mapRawRowToTransactionData } from '@/lib/utils'
+import { BlockchainTransaction, RawTransactionRow } from '@/types'
 import { useEffect, useState } from 'react'
 
 export const useBlockchainTransaction = () => {
@@ -7,7 +8,7 @@ export const useBlockchainTransaction = () => {
 
   const fetchTransactions = () => {
     const { rows } = getTransactions()
-    const parsedTransactions = rows.map((row) => mapRawRowToTransactionData(row))
+    const parsedTransactions = rows.map((row: RawTransactionRow) => mapRawRowToTransactionData(row))
     setTransactions(parsedTransactions)
   }
 
