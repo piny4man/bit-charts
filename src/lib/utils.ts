@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { BlockchainTransaction, RawTransactionRow } from '@/types'
 import { chartColors } from './constants'
+import { ChartData } from 'chart.js'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -28,7 +29,10 @@ export function mapRawRowToTransactionData(rawData: RawTransactionRow): Blockcha
   }
 }
 
-export function getUserWalletTrends(transactions: BlockchainTransaction[]): { labels: string[]; datasets: any } {
+export function getUserWalletTrends(transactions: BlockchainTransaction[]): {
+  labels: string[]
+  datasets: ChartData<'scatter'>['datasets']
+} {
   const data = transactions.reduce(
     (acc, transaction) => {
       const date = transaction.createdTime
@@ -67,7 +71,10 @@ export function getUserWalletTrends(transactions: BlockchainTransaction[]): { la
   return { labels, datasets }
 }
 
-export function getPaymentMethodTrends(transactions: BlockchainTransaction[]): { labels: string[]; datasets: any } {
+export function getPaymentMethodTrends(transactions: BlockchainTransaction[]): {
+  labels: string[]
+  datasets: ChartData<'line'>['datasets']
+} {
   const data = transactions.reduce(
     (acc, transaction) => {
       const date = transaction.createdTime
