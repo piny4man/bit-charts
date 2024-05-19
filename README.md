@@ -9,4 +9,5 @@ Stats charts React PoC
 ## Tech Stack
 
 **Client:** React, Typescript, TailwindCSS, Shadcn, Charts.js
+
 **Server:** Rust, Axum
