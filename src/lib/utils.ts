@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { BlockchainTransaction, RawTransactionRow } from '@/types'
 import { chartColors } from './constants'
 
 export function cn(...inputs: ClassValue[]) {
@@ -27,54 +28,85 @@ export function mapRawRowToTransactionData(rawData: RawTransactionRow): Blockcha
   }
 }
 
-export function getUserWalletTrends(transactions: BlockchainTransaction[]): any {
-  const userWalletCounts: { [x: string]: number } = {}
-  transactions.forEach((transaction) => {
-    const wallet = transaction.userWallet ?? 'Other'
-    if (userWalletCounts[wallet]) {
-      userWalletCounts[wallet]++
-    } else {
-      userWalletCounts[wallet] = 1
-    }
-  })
+export function getUserWalletTrends(transactions: BlockchainTransaction[]): { labels: string[]; datasets: any } {
+  const data = transactions.reduce(
+    (acc, transaction) => {
+      const date = transaction.createdTime
+      const wallet = transaction.userWallet || 'Other'
 
-  const labels = Object.keys(userWalletCounts)
-  const walletCounts = Object.values(userWalletCounts)
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: '# Tx',
-        data: walletCounts,
-        backgroundColor: walletCounts.map((_, index) => chartColors[index])
+      if (!acc[date]) {
+        acc[date] = {}
       }
-    ]
-  }
+
+      if (!acc[date][wallet]) {
+        acc[date][wallet] = 0
+      }
+
+      acc[date][wallet] += 1
+
+      return acc
+    },
+    {} as Record<string, Record<string, number>>
+  )
+
+  const labels = Object.keys(data).sort()
+  const walletTypes = Array.from(new Set(transactions.map((transaction) => transaction.userWallet || 'Other')))
+
+  const datasets = walletTypes.map((wallet, index) => ({
+    label: wallet,
+    data: labels
+      .map((date) => ({
+        x: new Date(date).getTime(),
+        y: data[date][wallet] || 0
+      }))
+      .filter((point) => point.y !== 0),
+    borderColor: chartColors[index],
+    backgroundColor: chartColors[index]
+  }))
+
+  return { labels, datasets }
 }
 
-export function getPaymentMethodTrends(transactions: BlockchainTransaction[]): any {
-  const userWalletCounts: { [x: string]: number } = {}
-  transactions.forEach((transaction) => {
-    const wallet = transaction.paymentMethod ?? 'Other'
-    if (userWalletCounts[wallet]) {
-      userWalletCounts[wallet]++
-    } else {
-      userWalletCounts[wallet] = 1
-    }
-  })
+export function getPaymentMethodTrends(transactions: BlockchainTransaction[]): { labels: string[]; datasets: any } {
+  const data = transactions.reduce(
+    (acc, transaction) => {
+      const date = transaction.createdTime
+      const paymentType = transaction.paymentMethod
 
-  const labels = Object.keys(userWalletCounts)
-  const walletCounts = Object.values(userWalletCounts)
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: '# Tx',
-        data: walletCounts,
-        backgroundColor: walletCounts.map((_, index) => chartColors[index])
+      if (!acc[date]) {
+        acc[date] = {}
       }
-    ]
-  }
+
+      if (!acc[date][paymentType]) {
+        acc[date][paymentType] = 0
+      }
+
+      acc[date][paymentType] += 1
+
+      return acc
+    },
+    {} as Record<string, Record<string, number>>
+  )
+
+  const labels = Object.keys(data).sort()
+  const paymentTypes = Array.from(new Set(transactions.map((transaction) => transaction.paymentMethod)))
+
+  const datasets = paymentTypes.map((type, index) => ({
+    label: type,
+    data: labels.map((date) => data[date][type] || 0),
+    fill: false,
+    borderColor: chartColors[index]
+  }))
+
+  return { labels, datasets }
+}
+
+export function getZeroConfData(transactions: BlockchainTransaction[]): {
+  zeroConfCount: number
+  nonZeroConfCount: number
+} {
+  const zeroConfCount = transactions.filter((transaction) => transaction.zeroConfTime).length
+  const nonZeroConfCount = transactions.length - zeroConfCount
+
+  return { zeroConfCount, nonZeroConfCount }
 }

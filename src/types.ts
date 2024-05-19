@@ -1,4 +1,4 @@
-type RawTransactionRow = {
+export type RawTransactionRow = {
   payment_method: string
   purchase_category: string
   country: string
@@ -17,12 +17,12 @@ type RawTransactionRow = {
   ID: number
 }
 
-type TransactionsResponse = {
+export type TransactionsResponse = {
   table: string
   rows: RawTransactionRow[]
 }
 
-type BlockchainTransaction = {
+export type BlockchainTransaction = {
   paymentMethod: string
   purchaseCategory: string
   country: string
@@ -39,4 +39,8 @@ type BlockchainTransaction = {
   userWallet: string
   isWalletConnect: string
   id: number
+}
+
+export type ChartComponentProps = {
+  transactions: BlockchainTransaction[]
 }

@@ -1,17 +1,52 @@
 import { getPaymentMethodTrends } from '@/lib/utils'
-import { useMemo } from 'react'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Pie } from 'react-chartjs-2'
+import { ChartComponentProps } from '@/types'
+import { Chart, ChartOptions, registerables } from 'chart.js'
+import { Line } from 'react-chartjs-2'
+import 'chartjs-adapter-date-fns'
 
-type Props = {
-  transactions: BlockchainTransaction[]
-}
+Chart.register(...registerables)
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+const WalletTrends = ({ transactions }: ChartComponentProps) => {
+  const { labels, datasets } = getPaymentMethodTrends(transactions)
 
-const WalletTrends = ({ transactions }: Props) => {
-  const chartData = useMemo(() => getPaymentMethodTrends(transactions), [transactions])
-  return <Pie data={chartData} redraw updateMode="resize" />
+  const options: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: '#E5E5E5'
+        }
+      }
+    },
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'day'
+        },
+        grid: {
+          color: '#27272A'
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Number of Transactions',
+          color: '#E5E5E5'
+        },
+        grid: {
+          color: '#27272A'
+        }
+      }
+    }
+  }
+
+  return (
+    <section className="flex flex-row gap-5">
+      <Line data={{ labels, datasets }} options={options} />
+    </section>
+  )
 }
 
 export default WalletTrends
